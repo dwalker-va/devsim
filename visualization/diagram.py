@@ -26,11 +26,11 @@ class AnimatedDiagram:
     
     # Stock display names
     STOCK_NAMES = {
-        'open_tickets': 'Open Tickets',
-        'started_coding': 'Started Coding',
-        'tested_code': 'Tested Code',
-        'deployed_code': 'Deployed Code',
-        'closed_tickets': 'Closed Tickets',
+        'open_tickets': 'Backlog',
+        'started_coding': 'In Development',
+        'tested_code': 'In Testing',
+        'deployed_code': 'Awaiting Release',
+        'closed_tickets': 'Live in Production',
     }
     
     # Colors
@@ -91,20 +91,20 @@ class AnimatedDiagram:
             )
         
         # Add forward flow arrows
-        self._add_arrow(fig, 0.4, 2, 1.6, 2, self.COLOR_FORWARD_FLOW, "→ Start")
-        self._add_arrow(fig, 2.4, 2, 3.6, 2, self.COLOR_FORWARD_FLOW, "→ Test")
-        self._add_arrow(fig, 4.4, 2, 5.6, 2, self.COLOR_FORWARD_FLOW, "→ Deploy")
-        self._add_arrow(fig, 6.4, 2, 7.6, 2, self.COLOR_FORWARD_FLOW, "→ Close")
+        self._add_arrow(fig, 0.4, 2, 1.6, 2, self.COLOR_FORWARD_FLOW, "→ Start Work")
+        self._add_arrow(fig, 2.4, 2, 3.6, 2, self.COLOR_FORWARD_FLOW, "→ Begin Testing")
+        self._add_arrow(fig, 4.4, 2, 5.6, 2, self.COLOR_FORWARD_FLOW, "→ Stage Release")
+        self._add_arrow(fig, 6.4, 2, 7.6, 2, self.COLOR_FORWARD_FLOW, "→ Go Live")
         
         # Add error flow arrows (curved, going backward)
-        # Testing error: Tested Code -> Started Coding
-        self._add_curved_arrow(fig, 3.8, 2.35, 2.2, 2.35, self.COLOR_ERROR_FLOW, "Test Errors", offset=0.6)
+        # Testing error: In Testing -> In Development
+        self._add_curved_arrow(fig, 3.8, 2.35, 2.2, 2.35, self.COLOR_ERROR_FLOW, "Bugs Found", offset=0.6)
         
-        # Deployment error: Deployed Code -> Started Coding
-        self._add_curved_arrow(fig, 5.8, 2.35, 2.2, 2.35, self.COLOR_ERROR_FLOW, "Deploy Errors", offset=0.9)
+        # Deployment error: Awaiting Release -> In Development
+        self._add_curved_arrow(fig, 5.8, 2.35, 2.2, 2.35, self.COLOR_ERROR_FLOW, "Release Blocked", offset=0.9)
         
-        # Production error: Closed Tickets -> Open Tickets
-        self._add_curved_arrow(fig, 7.8, 2.35, 0.2, 2.35, self.COLOR_ERROR_FLOW, "Prod Errors", offset=1.2)
+        # Production error: Live in Production -> Backlog
+        self._add_curved_arrow(fig, 7.8, 2.35, 0.2, 2.35, self.COLOR_ERROR_FLOW, "Prod Defects", offset=1.2)
         
         # Add flow values if provided
         if flows:

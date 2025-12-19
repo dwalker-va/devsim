@@ -66,11 +66,11 @@ The application will open in your default web browser at `http://localhost:8501`
 
 ### Five Stocks (Stages)
 
-1. **Open Tickets** - Work waiting to be started
-2. **Started Coding** - Work in active development
-3. **Tested Code** - Work that has been tested
-4. **Deployed Code** - Work that has been deployed
-5. **Closed Tickets** - Completed work
+1. **Backlog** - Work waiting to be started
+2. **In Development** - Work in active development
+3. **In Testing** - Work that has been tested
+4. **Awaiting Release** - Work staged for production
+5. **Live in Production** - Completed work deployed to users
 
 ### Forward Flows (Left to Right)
 
@@ -78,9 +78,9 @@ The application will open in your default web browser at `http://localhost:8501`
 
 ### Backward Error Flows (Right to Left)
 
-- **Testing Errors**: Tested Code → Started Coding
-- **Deployment Errors**: Deployed Code → Started Coding
-- **Production Errors**: Closed Tickets → Open Tickets
+- **Bugs Found in Testing**: In Testing → In Development
+- **Release Blocked**: Awaiting Release → In Development
+- **Defects in Production**: Live in Production → Backlog
 
 ### Key Dynamics
 
@@ -97,7 +97,7 @@ Default ranges are scaled for a typical development organization:
 - **Error Rates**: 0% to 50% (0.0 to 0.5)
 - **Flow Rates**: 1 to 100 tickets per time step
 - **Max Concurrent**: 1 to 200 tickets
-- **Initial Open Tickets**: 10 to 1000
+- **Initial Backlog Size**: 10 to 1000
 - **Simulation Duration**: 20 to 200 time steps
 
 Adjust these ranges in the code if your organization operates at a different scale.
@@ -112,7 +112,7 @@ Other Errors: 10-15%
 Flow Rates: All at 10
 ```
 
-**Result**: System reaches equilibrium quickly. Closed tickets plateau as production errors keep reopening work.
+**Result**: System reaches equilibrium quickly. Items live in production plateau as production defects keep returning work to the backlog.
 
 ### Scenario 2: Improved Testing (Lower Production Errors)
 
@@ -122,7 +122,7 @@ Testing Error Rate: 20% (increased)
 Other parameters: Same as baseline
 ```
 
-**Result**: More time spent in testing loop (catching errors early), but many more tickets successfully close over time.
+**Result**: More time spent in testing loop (catching errors early), but many more items successfully go live over time.
 
 ### Scenario 3: Faster Development, Same Errors
 
@@ -131,7 +131,7 @@ All Flow Rates: 30 (3x faster)
 Error Rates: Same as baseline
 ```
 
-**Result**: Minimal improvement in closed tickets. The constraint is error rate, not development speed.
+**Result**: Minimal improvement in items going live. The constraint is error rate, not development speed.
 
 ## Project Structure
 

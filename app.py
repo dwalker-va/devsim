@@ -27,7 +27,7 @@ st.markdown("""
 This simulation models the software development process to understand how different factors impact velocity.
 Based on [Will Larson's systems model](https://lethain.com/dx-llm-model/).
 
-**Key insight**: Production error rate is often the primary constraint on velocity, not development speed.
+Experiment with different parameters to discover which factors have the biggest impact on your delivery velocity.
 """)
 
 # Initialize session state for simulation persistence
@@ -46,79 +46,79 @@ st.sidebar.subheader("🔴 Error Rates")
 st.sidebar.markdown("*Percentage of items that encounter errors*")
 
 testing_error_rate = st.sidebar.slider(
-    "Testing Error Rate",
+    "Bugs Found in Testing",
     min_value=0.0,
     max_value=0.5,
     value=0.15,
     step=0.01,
     format="%.2f",
-    help="Fraction of tested code that has errors found during testing"
+    help="Fraction of items in testing that have bugs discovered"
 )
 
 deployment_error_rate = st.sidebar.slider(
-    "Deployment Error Rate",
+    "Release Blocked Rate",
     min_value=0.0,
     max_value=0.5,
     value=0.10,
     step=0.01,
     format="%.2f",
-    help="Fraction of deployed code that encounters errors during deployment"
+    help="Fraction of releases that encounter blocking issues"
 )
 
 production_error_rate = st.sidebar.slider(
-    "Production Error Rate",
+    "Production Defect Rate",
     min_value=0.0,
     max_value=0.5,
     value=0.25,
     step=0.01,
     format="%.2f",
-    help="Fraction of closed tickets that are reopened due to production errors"
+    help="Fraction of live items that have defects discovered in production"
 )
 
 st.sidebar.divider()
 
 # Flow Rates Section
 st.sidebar.subheader("⚡ Flow Rates")
-st.sidebar.markdown("*Tickets processed per time step*")
+st.sidebar.markdown("*Items processed per time step*")
 
 ticket_open_rate = st.sidebar.slider(
-    "Ticket Opening Rate",
+    "New Work Added to Backlog",
     min_value=1,
     max_value=100,
     value=10,
-    help="Number of new tickets opened per time step"
+    help="Number of new items added to backlog per time step"
 )
 
 start_coding_rate = st.sidebar.slider(
-    "Start Coding Rate",
+    "Start Development Rate",
     min_value=1,
     max_value=100,
     value=10,
-    help="Number of tickets that can be started per time step"
+    help="Number of items that can begin development per time step"
 )
 
 testing_rate = st.sidebar.slider(
-    "Testing Rate",
+    "Testing Throughput",
     min_value=1,
     max_value=100,
     value=10,
-    help="Number of tickets that can be tested per time step"
+    help="Number of items that can be tested per time step"
 )
 
 deployment_rate = st.sidebar.slider(
-    "Deployment Rate",
+    "Release Staging Rate",
     min_value=1,
     max_value=100,
     value=10,
-    help="Number of tickets that can be deployed per time step"
+    help="Number of items that can be staged for release per time step"
 )
 
 close_rate = st.sidebar.slider(
-    "Closing Rate",
+    "Go Live Rate",
     min_value=1,
     max_value=100,
     value=10,
-    help="Number of tickets that can be closed per time step"
+    help="Number of items that can go live per time step"
 )
 
 st.sidebar.divider()
@@ -127,11 +127,11 @@ st.sidebar.divider()
 st.sidebar.subheader("🎯 Capacity Constraints")
 
 max_concurrent_coding = st.sidebar.slider(
-    "Max Concurrent Coding",
+    "Max Work in Progress",
     min_value=1,
     max_value=200,
     value=50,
-    help="Maximum number of tickets that can be in development simultaneously"
+    help="Maximum number of items that can be in development simultaneously (WIP limit)"
 )
 
 st.sidebar.divider()
@@ -140,12 +140,12 @@ st.sidebar.divider()
 st.sidebar.subheader("🎬 Initial State")
 
 initial_open_tickets = st.sidebar.number_input(
-    "Initial Open Tickets",
+    "Initial Backlog Size",
     min_value=10,
     max_value=1000,
     value=100,
     step=10,
-    help="Number of open tickets at the start of simulation"
+    help="Number of items in backlog at the start of simulation"
 )
 
 st.sidebar.divider()
@@ -226,11 +226,11 @@ if st.session_state.simulation is not None:
         }
         
         stock_names = {
-            'open_tickets': 'Open Tickets',
-            'started_coding': 'Started Coding',
-            'tested_code': 'Tested Code',
-            'deployed_code': 'Deployed Code',
-            'closed_tickets': 'Closed Tickets',
+            'open_tickets': 'Backlog',
+            'started_coding': 'In Development',
+            'tested_code': 'In Testing',
+            'deployed_code': 'Awaiting Release',
+            'closed_tickets': 'Live in Production',
         }
         
         for stock_col, display_name in stock_names.items():
@@ -245,7 +245,7 @@ if st.session_state.simulation is not None:
         
         fig_stocks.update_layout(
             xaxis_title="Time Step",
-            yaxis_title="Number of Tickets",
+            yaxis_title="Number of Items",
             hovermode='x unified',
             legend=dict(
                 orientation="h",
@@ -267,17 +267,17 @@ if st.session_state.simulation is not None:
         max_in_progress = history_df['started_coding'].max()
         
         with col1:
-            st.metric("Final Closed Tickets", f"{int(final_closed)}")
+            st.metric("Items Live in Production", f"{int(final_closed)}")
         
         with col2:
-            st.metric("Final Open Tickets", f"{int(final_open)}")
+            st.metric("Items in Backlog", f"{int(final_open)}")
         
         with col3:
-            st.metric("Max Concurrent Coding", f"{int(max_in_progress)}")
+            st.metric("Peak Work in Progress", f"{int(max_in_progress)}")
         
         with col4:
             avg_velocity = final_closed / duration if duration > 0 else 0
-            st.metric("Avg Velocity", f"{avg_velocity:.1f} tickets/step")
+            st.metric("Avg Velocity", f"{avg_velocity:.1f} items/step")
     
     with tab2:
         st.subheader("Stock & Flow Diagram")
@@ -326,10 +326,10 @@ if st.session_state.simulation is not None:
         fig_forward = go.Figure()
         
         forward_flows = {
-            'start_coding_flow': 'Start Coding',
-            'testing_flow': 'Testing',
-            'deployment_flow': 'Deployment',
-            'closing_flow': 'Closing',
+            'start_coding_flow': 'Start Development',
+            'testing_flow': 'Begin Testing',
+            'deployment_flow': 'Stage for Release',
+            'closing_flow': 'Go Live',
         }
         
         for flow_col, display_name in forward_flows.items():
@@ -343,7 +343,7 @@ if st.session_state.simulation is not None:
         
         fig_forward.update_layout(
             xaxis_title="Time Step",
-            yaxis_title="Tickets Processed",
+            yaxis_title="Items Processed",
             hovermode='x unified',
             height=300,
         )
@@ -355,9 +355,9 @@ if st.session_state.simulation is not None:
         fig_errors = go.Figure()
         
         error_flows = {
-            'testing_error_flow': 'Testing Errors',
-            'deployment_error_flow': 'Deployment Errors',
-            'production_error_flow': 'Production Errors',
+            'testing_error_flow': 'Bugs Found in Testing',
+            'deployment_error_flow': 'Release Blocked',
+            'production_error_flow': 'Defects in Production',
         }
         
         colors_errors = ['#e74c3c', '#e67e22', '#c0392b']
@@ -373,7 +373,7 @@ if st.session_state.simulation is not None:
         
         fig_errors.update_layout(
             xaxis_title="Time Step",
-            yaxis_title="Tickets with Errors",
+            yaxis_title="Items Requiring Rework",
             hovermode='x unified',
             height=300,
         )
@@ -387,7 +387,7 @@ if st.session_state.simulation is not None:
             flow_history_df['production_error_flow'].sum()
         )
         
-        st.metric("Total Rework (all error flows)", f"{int(total_rework)} tickets")
+        st.metric("Total Rework (all error flows)", f"{int(total_rework)} items")
 
 else:
     # Initial state - show instructions
@@ -398,26 +398,17 @@ else:
     
     This simulation implements a stock and flow model of the software development process with five stages:
     
-    1. **Open Tickets** - Work waiting to be started
-    2. **Started Coding** - Work in active development
-    3. **Tested Code** - Work that has been tested
-    4. **Deployed Code** - Work that has been deployed
-    5. **Closed Tickets** - Completed work
+    1. **Backlog** - Work waiting to be started
+    2. **In Development** - Work in active development
+    3. **In Testing** - Work that has been tested
+    4. **Awaiting Release** - Work staged for production
+    5. **Live in Production** - Completed work deployed to users
     
     The model includes three types of error flows that move work backwards:
     
-    - **Testing Errors**: Bugs found during testing send work back to coding
-    - **Deployment Errors**: Issues during deployment send work back to coding
-    - **Production Errors**: Bugs found in production reopen tickets
-    
-    ### Key Insights
-    
-    From Will Larson's analysis, this model reveals:
-    
-    - 📉 **Production error rate is the primary constraint** on velocity
-    - 🔄 **Increasing testing time might indicate success** if it catches more errors early
-    - ⚡ **Faster development doesn't help** if production error rates remain high
-    - 🎯 **Focus on quality over speed** to maximize long-term velocity
+    - **Bugs Found in Testing**: Issues discovered during testing send work back to development
+    - **Release Blocked**: Problems during release staging send work back to development
+    - **Defects in Production**: Bugs found in production return work to the backlog
     
     ### How to Use
     
